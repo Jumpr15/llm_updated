@@ -23,7 +23,7 @@ class HFStreamingDataset(IterableDataset):
       )
       enc_seq = enc['input_ids'].squeeze(0)
       
-      if len(enc_seq) < 2:
+      if len(enc_seq) < self.seq_len + 1:
         continue
       
       yield enc_seq[:-1], enc_seq[1:]

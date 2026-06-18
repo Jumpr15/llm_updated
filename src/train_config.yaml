@@ -24,7 +24,7 @@ max_epochs: 1
 num_workers: 8
 
 # model parameters
-seq_len: 256
+seq_len: 128
 embed_dims: 256
 head_size: 32
 num_heads: 8
