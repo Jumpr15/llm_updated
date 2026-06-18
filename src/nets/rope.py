@@ -8,6 +8,7 @@ from transformers.models.llama.modeling_llama import (
 
 class RoPE(nn.Module):
   def __init__(self, seq_len, num_heads, head_size):
+    super().__init__()
     config = LlamaConfig(
       hidden_size=num_heads * head_size, # Total dimension of the model's embeddings
       num_attention_heads=num_heads,    # Number of attention heads
