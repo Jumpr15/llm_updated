@@ -17,27 +17,27 @@ def main():
           pretrain_ckpt = config['pretrain_ckpt']
           
           run_id = config['run_id']
-          save_every_n_train_steps = config['save_every_n_train_steps']
-          save_top_k = config['save_top_k']
-          log_every_n_steps = config['log_every_n_steps']
+          save_every_n_train_steps = int(config['save_every_n_train_steps'])
+          save_top_k = int(config['save_top_k'])
+          log_every_n_steps = int(config['log_every_n_steps'])
           
           precision = config['precision']
-          gradient_clip_val = config['gradient_clip_val']
-          devices = config['devices']
+          gradient_clip_val = float(config['gradient_clip_val'])
+          devices = int(config['devices'])
           
-          batch_size = config['batch_size']
-          batch_acc = config['batch_acc']
-          lr = config['lr']
-          iterations = config['iterations']
-          max_epochs= config['max_epochs']
-          num_workers = config['num_workers']
+          batch_size = int(config['batch_size'])
+          batch_acc = int(config['batch_acc'])
+          lr = float(config['lr'])
+          iterations = int(config['iterations'])
+          max_epochs= int(config['max_epochs'])
+          num_workers = int(config['num_workers'])
           
-          seq_len = config['seq_len']
-          embed_dims = config['embed_dims']
-          head_size = config['head_size']
-          num_heads = config['num_heads']
-          block_num = config['block_num']
-          vocab_size = config['vocab_size']
+          seq_len = int(config['seq_len'])
+          embed_dims = int(config['embed_dims'])
+          head_size = int(config['head_size'])
+          num_heads = int(config['num_heads'])
+          block_num = int(config['block_num'])
+          vocab_size = int(config['vocab_size'])
           
      wandb_logger = WandbLogger(
          log_model="all",
