@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from llm_updated.src.nets.rope import RoPE
+from src.nets.rope import RoPE
 
 class Attention_Head(nn.Module):
     def __init__(self, seq_len, embed_dims, head_size, num_heads):
