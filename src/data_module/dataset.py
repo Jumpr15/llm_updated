@@ -3,7 +3,6 @@ import lightning as L
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
-import torch
 from torch.utils.data import IterableDataset, DataLoader
 
 class HFStreamingDataset(IterableDataset):

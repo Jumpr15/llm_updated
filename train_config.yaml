@@ -1,7 +1,7 @@
 # hf 
 dataset_ckpt: 'roneneldan/TinyStories'
 tokenizer_ckpt: 'HuggingFaceTB/SmolLM-1.7B'
-save_ckpt: '/local'
+save_ckpt: 'model_ckpts'
 pretrain_ckpt: ~
 
 # wandb + lightning callback
