@@ -1,13 +1,13 @@
 # hf 
-dataset_ckpt: roneneldan/TinyStories
+dataset_ckpt: HuggingFaceFW/fineweb-edu
 tokenizer_ckpt: HuggingFaceTB/SmolLM-1.7B
 
 save_ckpt: model_ckpts
 pretrain_ckpt: ~
 
 # wandb + lightning callback
-run_id: tinystories_v4_real_run
-save_every_n_train_steps: 500
+run_id: fineweb_edu_v1
+save_every_n_train_steps: 250
 save_top_k: -1
 log_every_n_steps: 10
 
@@ -17,17 +17,17 @@ gradient_clip_val: 1.0
 devices: 1
 
 # training hyperparameters 
-batch_size: 64
+batch_size: 128
 batch_acc: 1
-lr: 5e-4
-iterations: 10010
+lr: 3e-4
+iterations: 20000
 max_epochs: 1
 num_workers: 4
 
 # model parameters
-seq_len: 384
-embed_dims: 512
+seq_len: 2048
+embed_dims: 1024
 head_size: 64
-num_heads: 8
-block_num: 8
+num_heads: 16
+block_num: 16
 vocab_size: 49152
