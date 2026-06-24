@@ -21,6 +21,8 @@ class LightningTransformer(L.LightningModule, PyTorchModelHubMixin):
         vocab_size,
         lr,
         iterations,
+        use_liger=False,
+        tie_weights=False
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -30,19 +32,32 @@ class LightningTransformer(L.LightningModule, PyTorchModelHubMixin):
         self.head_size = head_size
         self.num_heads = num_heads
         self.vocab_size = vocab_size
-
-        self.lr = lr
-        self.iterations = iterations
-
-        self.softmax = liger.LigerSoftmax()
-        self.cross_entropy = liger.LigerCrossEntropyLoss()
-
-        self.token_embed = nn.Embedding(vocab_size, embed_dims)
-        self.rms_Norm_embed = liger.LigerRMSNorm(embed_dims)
-        self.embed_proj = nn.Linear(embed_dims, vocab_size)
+        
         self.block_list = nn.ModuleList(
             [Block(seq_len, embed_dims, head_size, num_heads) for _ in range(block_num)]
         )
+
+        self.lr = lr
+        self.iterations = iterations
+            
+        self.token_embed = nn.Embedding(vocab_size, embed_dims)
+        self.embed_proj = nn.Linear(embed_dims, vocab_size)
+        
+        # Set both layers to same weights if using weight tying (Torch auto-transposes)
+        if tie_weights:
+            self.token_embed.weight = self.embed_proj.weight
+        
+        # use Liger kernel if CUDA is available and LigerKernel is installed
+        if use_liger: 
+            self.softmax = liger.LigerSoftmax()
+            self.cross_entropy = liger.LigerCrossEntropyLoss()
+            self.rms_Norm_embed = liger.LigerRMSNorm(embed_dims)
+           
+        # fallback to Pytorch and Transformers 
+        else: 
+            self.softmax = nn.Softmax(dim=-1)
+            self.cross_entropy = nn.CrossEntropyLoss()
+            self.rms_Norm_embed = nn.RMSNorm()
         
     def _init_weights(self, module):
         if isinstance(module, nn.Linear):
