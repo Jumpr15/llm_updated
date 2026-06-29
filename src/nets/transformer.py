@@ -1,15 +1,17 @@
 import torch
 import torch.nn as nn
 import lightning as L
-import importlib.util 
 
-from torch.optim import AdamW, SequentialLR, LinearLR, ConstantLR, CosineAnnealingLR
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import SequentialLR, LinearLR, ConstantLR, CosineAnnealingLR
 from huggingface_hub import PyTorchModelHubMixin
 
-if importlib.util.find_spec('liger-kernel'):
+import importlib.util 
+if importlib.util.find_spec('liger_kernel'):
     import liger_kernel.transformers as liger
 
 from nets.attention_block import Block
+from utils.lr_scheduler import WSD_Scheduler
 
 class LightningTransformer(L.LightningModule, PyTorchModelHubMixin):
     def __init__(
@@ -29,7 +31,7 @@ class LightningTransformer(L.LightningModule, PyTorchModelHubMixin):
         tie_weights=False
     ):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters() # Logs hyperparameters to WandB
         self.batch_size = batch_size
         self.seq_len = seq_len
         self.embed_dims = embed_dims
@@ -83,32 +85,11 @@ class LightningTransformer(L.LightningModule, PyTorchModelHubMixin):
     def configure_optimizers(self):
         optimizer = AdamW(self.parameters(), lr=self.lr)
         
-        warmup_scheduler = LinearLR(
-            optimizer,
-            start_factor=0.1,
-            end_factor=1.0,
-            total_iters=self.warmup_steps
-        )
-        
-        stable_scheduler = ConstantLR(
-            optimizer,
-            factor=1.0
-        )
-        
-        cosine_decay_scheduler = CosineAnnealingLR(
-            optimizer, 
-            T_max=self.iterations*self.decay_ratio
-        )
-        
-        wsd_scheduler = SequentialLR(
-            optimizer,
-            schedulers=[warmup_scheduler, stable_scheduler, cosine_decay_scheduler],
-            milestones=[self.warmup_steps, self.iterations * (1 - self.decay_ratio)]
-        )
+        wsd_scheduler = WSD_Scheduler(self.warmup_steps, self.iterations, optimizer, self.decay_ratio)
         
         return {
             "optimizer": optimizer,
-            "lr_scheduler": {"scheduler": wsd_scheduler, "interval": "step"},
+            "lr_scheduler": {"scheduler": wsd_scheduler.get_scheduler(), "interval": "step"},
         }
 
     def training_step(self, batch, batch_idx):

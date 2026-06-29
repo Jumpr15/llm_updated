@@ -7,6 +7,7 @@ import yaml
 
 from nets.transformer import LightningTransformer
 from data_module.dataset import LightningDataLoader
+from utils.hf_upload import HFBucketRsync
 
 def main():
    with open('train_config.yaml', 'r') as f:
@@ -18,7 +19,11 @@ def main():
       pretrain_ckpt = config['pretrain_ckpt']
       enable_liger_kernel = bool(config['enable_liger_kernel'])
       
-      run_id = config['run_id']
+      hf_bucket_name=config['hf_bucket_name']
+      hf_bucket_save_dir=config['hf_bucket_save_dir']
+      
+      wandb_run_name = config['wandb_run_name']
+      wandb_run_project = config['wandb_run_project']
       save_every_n_train_steps = int(config['save_every_n_train_steps'])
       save_top_k = int(config['save_top_k'])
       log_every_n_steps = int(config['log_every_n_steps'])
@@ -42,14 +47,15 @@ def main():
       vocab_size = int(config['vocab_size'])
           
    wandb_logger = WandbLogger(
-      log_model="false",
-      resume="allow",
-      id=run_id
+      log_model='false',
+      resume='allow',
+      project=wandb_run_project,
+      name=wandb_run_name
    )
 
    # checks if CUDA available on device
    use_liger = False
-   if torch.cuda.is_available() and importlib.util.find_spec('liger-kernel') and enable_liger_kernel:
+   if torch.cuda.is_available() and importlib.util.find_spec('liger_kernel') and enable_liger_kernel:
       use_liger = True
 
    model = LightningTransformer(
@@ -83,13 +89,21 @@ def main():
       log_every_n_steps=log_every_n_steps,
       enable_checkpointing=True,
       devices=devices,
-      strategy="auto",
+      strategy='auto',
       callbacks=[
          L.pytorch.callbacks.ModelCheckpoint(
             dirpath=save_ckpt, 
             every_n_train_steps=save_every_n_train_steps, 
             save_top_k=save_top_k,
-            #save_weights_only=True
+         ),
+         L.pytorch.callbacks.LearningRateMonitor(
+            logging_interval='step'
+         ),
+         HFBucketRsync(
+            local_save_dir=save_ckpt,
+            bucket_name=hf_bucket_name,
+            bucket_save_dir=hf_bucket_save_dir,
+            every_n_train_steps=save_every_n_train_steps+1
          )
       ],
    )

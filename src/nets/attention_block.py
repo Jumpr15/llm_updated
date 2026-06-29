@@ -1,6 +1,7 @@
 import torch.nn as nn
 
-if importlib.util.find_spec('liger-kernel'):
+import importlib.util
+if importlib.util.find_spec('liger_kernel'):
     import liger_kernel.transformers as liger
 
 from nets.attention_head import Attention_Head
