@@ -1,16 +1,13 @@
 import lightning as L
 
-from datasets import load_dataset
-from transformers import AutoTokenizer
-
 from torch.utils.data import IterableDataset, DataLoader
 
 class HFStreamingDataset(IterableDataset):
-  def __init__(self, dataset_ckpt, tokenizer_ckpt, seq_len):
+  def __init__(self, dataset, tokenizer, seq_len):
     super().__init__()
     self.seq_len = seq_len
-    self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_ckpt)
-    self.dataset = load_dataset(dataset_ckpt, split='train', streaming=True)
+    self.tokenizer = tokenizer
+    self.dataset = dataset
 
   def __iter__(self):
     for seq in self.dataset:

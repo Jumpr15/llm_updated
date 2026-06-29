@@ -2,6 +2,9 @@ import torch
 from lightning.pytorch.loggers import WandbLogger
 import lightning as L
 
+from datasets import load_dataset
+from transformers import AutoTokenizer
+
 import importlib.util
 import yaml
 
@@ -14,6 +17,7 @@ def main():
       config = yaml.safe_load(f)
       
       dataset_ckpt = config['dataset_ckpt']
+      stream_dataset = bool(config['stream_dataset'])
       tokenizer_ckpt = config['tokenizer_ckpt']
       save_ckpt = config['save_ckpt']
       pretrain_ckpt = config['pretrain_ckpt']
@@ -71,9 +75,12 @@ def main():
       use_liger=use_liger
    )
 
+   dataset = load_dataset(dataset_ckpt, split='train', streaming=stream_dataset)
+   tokenizer = AutoTokenizer.from_pretrained(tokenizer_ckpt)
+
    dataloader = LightningDataLoader(
-      dataset_ckpt,
-      tokenizer_ckpt,
+      dataset,
+      tokenizer,
       batch_size,
       seq_len,
       num_workers
