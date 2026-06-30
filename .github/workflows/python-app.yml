@@ -36,4 +36,5 @@ jobs:
         uv run pytest
     - name: Mini-Training Runthrough
       run: |
-        uv run src/train.py
+        cd src
+        uv run train.py
