@@ -35,7 +35,7 @@ jobs:
     #   run: |
     #     uv run pytest
     - name: Load from .env file
-      uses: ./.github/actions/dotenv-action
+      uses: falti/dotenv-action@v1.2.1
     # - name: Mini-Training Runthrough
     #   run: |
     #     cd src
