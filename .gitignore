@@ -9,5 +9,8 @@ wheels/
 # Pytest cache
 .pytest_cache
 
+# Env file
+.env
+
 # Virtual environments
 .venv
