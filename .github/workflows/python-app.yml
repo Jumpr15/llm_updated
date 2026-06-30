@@ -34,3 +34,6 @@ jobs:
     - name: Test with pytest
       run: |
         uv run pytest
+    - name: Mini-Training Runthrough
+      run: |
+        uv run train.py
