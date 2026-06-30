@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Set up Python 3.14
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.14"
     - name: Install uv from Astral
@@ -34,9 +34,10 @@ jobs:
     # - name: Test with pytest
     #   run: |
     #     uv run pytest
-    - name: Load from .env file
-      uses: falti/dotenv-action@v1.2.1
-    # - name: Mini-Training Runthrough
-    #   run: |
-    #     cd src
-    #     uv run train.py
+    - name: Mini-Training Runthrough
+      env: 
+        WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        HF_TOKEN: ${{ secrest.HF_TOKEN }}
+      run: |
+        cd src
+        uv run train.py
